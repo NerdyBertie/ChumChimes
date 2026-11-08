@@ -3,7 +3,7 @@
 
 # Chum Chimes
 
-**Never miss a friend in passing.** Chum Chimes plays a friendly little chime when one of your guildies or friends is in the same zone as you, and a different one when they're right near you. Say hi, group up, or just wave as you pass.
+**Never miss a friend in passing!** Chum Chimes plays a friendly little chime when one of your guildies or friends is in the same zone as you, and a different one when they're right near you. Say hi, group up, wave as you pass, or strike up some impromptu RP!
 
 Works in **Retail** and **WoW Forever**.
 
@@ -36,7 +36,7 @@ The "right near me" chime notices a chum walking up when their nameplate appears
 
 ## Settings
 
-Find them under **Options → AddOns → NerdyBertie → Chum Chimes**: who to chime for, when to chime, the sound for each kind of chime, the on-screen line, the quiet time between chimes, the minimap button, and test buttons for everything.
+Find them under **Options → AddOns → NerdyBertie → Chum Chimes**: who to chime for, when to chime, how close counts as "right near me," the sound for each kind of chime, the on-screen line, the quiet time between chimes, the minimap button, and test buttons for everything.
 
 The AddOns and Options menus group my addons together, so you can find them all under the NerdyBertie heading.
 
