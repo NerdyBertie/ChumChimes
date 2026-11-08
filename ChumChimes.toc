@@ -11,6 +11,7 @@
 ## AddonCompartmentFuncOnLeave: ChumChimes_OnAddonCompartmentLeave
 ## X-Curse-Project-ID: 1791468
 ## X-WoWI-ID: 27300
+## X-Wago-ID: aNerZb62
 
 Libs\LibStub\LibStub.lua
 Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
