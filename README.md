@@ -9,9 +9,9 @@ Works in **Retail** and **WoW Forever**.
 
 ## Features
 
-- **"In my zone" chime.** When a guildie or friend is in the same zone as you, you get a chime and a line in chat, like "Tom just showed up in Hallowfall!" It works both ways: they arrive, or you do.
+- **"In my zone" chime.** When a guildie or friend is in the same zone as you, you get a chime and a line in chat, like "Tom just showed up in Silvermoon City!" It works both ways: they arrive, or you do.
 - **"Right near me" chime.** A different sound when one of them is close by, or when you mouse over or target them. "Psst! Tom is right by you!" You choose how close counts: Close (about 28 yards), Very close (about 10 yards), or as soon as their nameplate shows.
-- **One summary when you arrive somewhere busy.** Zone into a city full of guildies and you get one line and one chime, not a dozen: "Your chums in Dornogal: Tom, Johnny and 3 more!"
+- **One summary when you arrive somewhere busy.** Zone into a city full of guildies and you get one line and one chime, not a dozen: "Your chums in Stormwind: Tom, Johnny, Nathan and 3 more!"
 - **No spam.** Each person chimes once, then stays quiet for 10 minutes. Change that to anything from 1 to 60 minutes.
 - **Guild, WoW friends and Battle.net friends.** Each one has its own on/off switch.
 - **Clickable names.** Click a name in chat to whisper them right away.
