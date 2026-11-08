@@ -1,4 +1,4 @@
-<p align=center><img width="256" height="256" alt="chumchimes" src="MASCOT_IMAGE_URL" /></p>
+<p align=center><img width="256" height="256" alt="chumchimes" src="[MASCOT_IMAGE_URL](https://github.com/user-attachments/assets/268e2dbb-edd5-49fa-bda3-70a38aa200c7)" /></p>
 
 
 # Chum Chimes
