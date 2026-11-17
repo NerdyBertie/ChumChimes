@@ -1,5 +1,14 @@
 # Chum Chimes
 
+## v1.1.0
+
+### New
+- Names glow in their class colors! Each name starts on its WoW class color and sweeps to a neighboring shade, like a Druid's orange fading to gold or a Mage's cyan fading to sky blue. Works in chat and in the middle-of-the-screen line, and the names are still clickable to whisper.
+- New setting: "Color names by class" (on by default). Turn it off for plain white names.
+
+### Changed
+- The NerdyBertie page in Options → AddOns now lists "ItemWatch & Shopping List" by its new name.
+
 ## v1.0.0
 
 ### New

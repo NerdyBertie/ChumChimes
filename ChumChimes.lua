@@ -29,6 +29,7 @@ local DB_DEFAULTS = {
     nearbySound    = "ping",
     nearbyRange    = "close",  -- "close" (~28 yd), "veryclose" (~10 yd) or "plate" (as soon as the nameplate shows)
     showMinimap    = true,
+    classColors    = true,     -- names glow in a sweep of their class color
 }
 
 local MASCOT      = "Interface\\AddOns\\" .. ADDON .. "\\Media\\chumchimes"
@@ -174,9 +175,69 @@ local function OnScreen(text)
     end
 end
 
+---------------------------------------------------------------------------
+-- Class-color names: each name starts on its true class color and sweeps
+-- toward a neighbor shade in the same family (start, end).
+---------------------------------------------------------------------------
+local CLASS_SWEEP = {
+    DEATHKNIGHT = { "D8072A", "F70094" },   -- crimson to rose
+    DEMONHUNTER = { "A919D8", "F704CA" },   -- purple to fel magenta
+    DRUID       = { "FF7600", "FFE500" },   -- orange to gold
+    EVOKER      = { "31D8B5", "1FCDF7" },   -- jade to teal
+    HUNTER      = { "A3D85B", "72F74F" },   -- leaf green to bright green
+    MAGE        = { "22C1EB", "0B77F7" },   -- cyan to sky blue
+    MONK        = { "00FF98", "00FFFE" },   -- jade to aqua
+    PALADIN     = { "F46EA9", "F757D8" },   -- pink to orchid
+    PRIEST      = { "FFFFFF", "FFE072" },   -- white to holy gold
+    ROGUE       = { "FFF149", "FFB82F" },   -- yellow to gold
+    SHAMAN      = { "0070DD", "00B7F7" },   -- royal blue to azure
+    WARLOCK     = { "6A6BEE", "9F55F7" },   -- periwinkle to violet
+    WARRIOR     = { "D89D5D", "F78651" },   -- tan to copper
+}
+
+-- Friends lists give the class as a translated name ("Druid", "Druide"...).
+-- Turn it into the game's class token ("DRUID").
+local classTokenByName
+local function ClassToken(className)
+    if not className or className == "" or IsSecret(className) then return nil end
+    if CLASS_SWEEP[className] then return className end
+    if not classTokenByName then
+        classTokenByName = {}
+        for _, list in ipairs({ LOCALIZED_CLASS_NAMES_MALE or {}, LOCALIZED_CLASS_NAMES_FEMALE or {} }) do
+            for token, name in pairs(list) do classTokenByName[name] = token end
+        end
+    end
+    return classTokenByName[className]
+end
+
+-- One UTF-8 letter at a time, so accented names don't get split mid-letter
+local function Letters(text)
+    local out = {}
+    for ch in text:gmatch("[%z\1-\127\194-\244][\128-\191]*") do out[#out + 1] = ch end
+    return out
+end
+
+local function Gradient(text, token)
+    local sweep = token and CLASS_SWEEP[token]
+    if not sweep or not ChumChimesDB.classColors then return Color(COLORS.name, text) end
+    local r1, g1, b1 = Hex(sweep[1])
+    local r2, g2, b2 = Hex(sweep[2])
+    local letters = Letters(text)
+    local steps = math.max(#letters - 1, 1)
+    local out = {}
+    for i, ch in ipairs(letters) do
+        local t = (i - 1) / steps
+        out[i] = format("|cff%02x%02x%02x%s|r",
+            math.floor((r1 + (r2 - r1) * t) * 255 + 0.5),
+            math.floor((g1 + (g2 - g1) * t) * 255 + 0.5),
+            math.floor((b1 + (b2 - b1) * t) * 255 + 0.5), ch)
+    end
+    return table.concat(out)
+end
+
 -- A clickable name in chat: click it to whisper, right-click for the usual menu
 local function NameLink(person)
-    local shown = Color(COLORS.name, person.short)
+    local shown = Gradient(person.short, person.class)
     if person.tag then shown = shown .. Color(COLORS.gray, " (" .. person.tag .. ")") end
     return "|Hplayer:" .. (person.link or person.key) .. "|h" .. shown .. "|h"
 end
@@ -266,19 +327,20 @@ local arrivingZone = nil
 -- full = "Name-Realm" (used for the lookup key). link = the name exactly as the
 -- game's own list gave it, so clicking it to whisper works the same as there
 -- (WoW Forever lists same-ruleset players with no realm, and allows last names).
-local function AddPerson(found, full, link, short, tag, zone, kind)
+local function AddPerson(found, full, link, short, tag, zone, kind, class)
     local key = Key(full)
     if not key or found[key] then return end
-    found[key] = { key = key, link = link or full, short = short or ShortName(full), tag = tag, zone = zone, kind = kind }
+    found[key] = { key = key, link = link or full, short = short or ShortName(full), tag = tag, zone = zone, kind = kind,
+        class = ClassToken(class) }
 end
 
 local function ReadGuild(found, zoneA, zoneB, me)
     if not (ChumChimesDB.guild and IsInGuild and IsInGuild()) then return end
     for i = 1, GetNumGuildMembers() do
-        local name, _, _, _, _, zone, _, _, online, _, _, _, _, isMobile, _, _, guid = GetGuildRosterInfo(i)
+        local name, _, _, _, _, zone, _, _, online, _, classFile, _, _, isMobile, _, _, guid = GetGuildRosterInfo(i)
         if online and not isMobile and zone and (zone == zoneA or zone == zoneB) then
             local full = FullName(name)
-            if full and not IsMe(Key(full), guid, me) then AddPerson(found, full, name, nil, nil, zone, "guild") end
+            if full and not IsMe(Key(full), guid, me) then AddPerson(found, full, name, nil, nil, zone, "guild", classFile) end
         end
     end
 end
@@ -289,7 +351,7 @@ local function ReadFriends(found, zoneA, zoneB, me)
         local info = C_FriendList.GetFriendInfoByIndex(i)
         if info and info.connected and info.area and (info.area == zoneA or info.area == zoneB) then
             local full = FullName(info.name)
-            if full and not IsMe(Key(full), info.guid, me) then AddPerson(found, full, info.name, nil, nil, info.area, "friend") end
+            if full and not IsMe(Key(full), info.guid, me) then AddPerson(found, full, info.name, nil, nil, info.area, "friend", info.className) end
         end
     end
 end
@@ -312,7 +374,7 @@ local function ReadBnet(found, zoneA, zoneB, me)
                 and game.areaName and (game.areaName == zoneA or game.areaName == zoneB) then
                 local full = FullName(game.characterName, game.realmName)
                 if full and not IsMe(Key(full), game.playerGuid, me) then
-                    AddPerson(found, full, nil, game.characterName, BattleTagName(account), game.areaName, "bnet")
+                    AddPerson(found, full, nil, game.characterName, BattleTagName(account), game.areaName, "bnet", game.className)
                 end
             end
         end
@@ -417,7 +479,11 @@ local function CheckUnit(unit)
     if not person and ChumChimesDB.guild and UnitIsInMyGuild and UnitIsInMyGuild(unit) then
         person = { key = key, link = link, short = name }
     end
-    if person then person.guid = guid end
+    if person then
+        person.guid = guid
+        local _, classFile = UnitClass(unit)
+        person.class = ClassToken(classFile)
+    end
     return person
 end
 
@@ -512,10 +578,10 @@ end
 ---------------------------------------------------------------------------
 -- Tests
 ---------------------------------------------------------------------------
-local TEST_PERSON = { key = "Sunny-Test", short = "Sunny", tag = "Sunny" }
+local TEST_PERSON = { key = "Sunny-Test", short = "Sunny", tag = "Sunny", class = "DRUID" }
 
 local function TestZone()
-    ZoneChime(TEST_PERSON, (MyZones()) ~= "" and (MyZones()) or "Dornogal", true)
+    ZoneChime(TEST_PERSON, (MyZones()) ~= "" and (MyZones()) or "Silvermoon City", true)
 end
 
 local function TestNearby()
@@ -524,11 +590,11 @@ end
 
 local function TestSummary()
     local people = {
-        { key = "Sunny-Test", short = "Sunny" },
-        { key = "Maple-Test", short = "Maple" },
-        { key = "Juniper-Test", short = "Juniper", tag = "Juni" },
+        { key = "Sunny-Test", short = "Sunny", class = "DRUID" },
+        { key = "Maple-Test", short = "Maple", class = "PALADIN" },
+        { key = "Juniper-Test", short = "Juniper", tag = "Juni", class = "MAGE" },
     }
-    SummaryChime(people, (MyZones()) ~= "" and (MyZones()) or "Dornogal", true)
+    SummaryChime(people, (MyZones()) ~= "" and (MyZones()) or "Silvermoon City", true)
 end
 
 ---------------------------------------------------------------------------
@@ -543,7 +609,7 @@ local SetMinimapShown   -- defined with the minimap button below
 local WORKSHOP_ADDONS = {
     { name = "HandyNotes: Dive Bar Front Crawl",   folder = "HandyNotes_DiveBarCrawl" },
     { name = "HandyNotes: Seeking the Soulstones", folder = "HandyNotes_SeekingTheSoulstones" },
-    { name = "ItemWatch",                          folder = "ItemWatch" },
+    { name = "ItemWatch & Shopping List",          folder = "ItemWatch" },
     { name = "Boomkin Buff Watcher",               folder = "BoomkinBuffWatcher" },
     { name = "Holiday Herald",                     folder = "HolidayHerald" },
     { name = "Pinkies Up!",                        folder = "PinkiesUp" },
@@ -679,7 +745,7 @@ local function BuildSettings()
             "How close a chum has to be before the \"right near me\" chime plays. Nameplates show up from quite far away, so Close waits until they're about follow distance. Mousing over or targeting them always chimes right away.")
     end
     Checkbox("arrivalSummary", "One summary line when I arrive somewhere busy",
-        "When you change zones, everyone already there gets one line and one chime, like \"Your chums in Dornogal: Tom, Johnny and 3 more!\", instead of a chime for each person.")
+        "When you change zones, everyone already there gets one line and one chime, like \"Your chums in Silvermoon City: Tom, Johnny and 3 more!\", instead of a chime for each person.")
     Checkbox("guildCheck", "Check where guildies are every 2 minutes",
         "The game doesn't tell addons when a guildie changes zones, so this asks the server for the guild and friends lists every 2 minutes. It's one small request, the same one the guild window makes. Battle.net friends update on their own either way. Turn this off and zone chimes for guild and WoW friends happen only when the lists refresh for some other reason, like when you change zones.")
     Checkbox("quietInstances", "Stay quiet in dungeons, raids, delves and battlegrounds",
@@ -690,6 +756,8 @@ local function BuildSettings()
         "Plays when a chum is in your zone. You'll hear it when you pick it.")
     SoundDropdown("nearbySound", "Sound for \"right near me\"",
         "Plays when a chum is right near you. You'll hear it when you pick it.")
+    Checkbox("classColors", "Color names by class",
+        "Names glow in a sweep of their class color, like a Druid's orange fading to gold. Turn this off for plain white names.")
     Checkbox("onScreen", "Also show it in the middle of the screen",
         "Flashes the line in the middle of your screen as well as in your chat window.")
     do

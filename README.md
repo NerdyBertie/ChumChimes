@@ -14,7 +14,7 @@ Works in **Retail** and **WoW Forever**.
 - **One summary when you arrive somewhere busy.** Zone into a city full of guildies and you get one line and one chime, not a dozen: "Your chums in Stormwind: Tom, Johnny, Nathan and 3 more!"
 - **No spam.** Each person chimes once, then stays quiet for 10 minutes. Change that to anything from 1 to 60 minutes.
 - **Guild, WoW friends and Battle.net friends.** Each one has its own on/off switch.
-- **Clickable names.** Click a name in chat to whisper them right away.
+- **Names in class colors.** Each name glows in a sweep of its WoW class color, like a Druid's orange fading to gold. Click a name in chat to whisper them right away.
 - **Knows when to hush.** Stays quiet in dungeons, raids, delves and battlegrounds, and skips people already in your group.
 - **Pick your sounds.** Choose a different sound for each kind of chime, or none at all.
 - **Light as a feather.** It only wakes up when the game says something changed. Two small exceptions: a "where is everyone?" request every 2 minutes for guild and friends zones (the game doesn't announce those, and you can turn it off), and when a chum's nameplate shows up far away, a once-a-second check on just that one person until they come close or wander off.
@@ -36,7 +36,7 @@ The "right near me" chime notices a chum walking up when their nameplate appears
 
 ## Settings
 
-Find them under **Options → AddOns → NerdyBertie → Chum Chimes**: who to chime for, when to chime, how close counts as "right near me," the sound for each kind of chime, the on-screen line, the quiet time between chimes, the minimap button, and test buttons for everything.
+Find them under **Options → AddOns → NerdyBertie → Chum Chimes**: who to chime for, when to chime, how close counts as "right near me," the sound for each kind of chime, class-colored names, the on-screen line, the quiet time between chimes, the minimap button, and test buttons for everything.
 
 The AddOns and Options menus group my addons together, so you can find them all under the NerdyBertie heading.
 
