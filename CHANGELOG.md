@@ -1,5 +1,10 @@
 # Chum Chimes
 
+## v1.1.1
+
+### Changed
+- Ready for patch 12.1.7 (December 1): Chum Chimes is marked up to date for the new patch, so it won't show as "out of date" in your AddOns list.
+
 ## v1.1.0
 
 ### New
